@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor de Tareas Colaborativo</title>
+  <link rel="stylesheet" href="./src/css/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Gestor de Tareas</h1>
+    <div id="user-info"></div>
+  </header>
+  <main class="layout">
+    <section class="panel auth-panel" id="auth-panel">
+      <h2>Autenticación</h2>
+      <form id="login-form">
+        <input type="text" id="username" placeholder="Usuario" required />
+        <button type="submit">Ingresar</button>
+      </form>
+      <div id="login-message" class="message"></div>
+    </section>
+
+    <section class="panel task-panel" id="task-panel" hidden>
+      <h2>Tareas</h2>
+      <form id="task-form">
+        <input type="text" id="task-title" placeholder="Título de la tarea" required />
+        <textarea id="task-desc" placeholder="Descripción"></textarea>
+        <select id="task-assignee"></select>
+        <button type="submit">Crear / Actualizar</button>
+        <button type="button" id="task-form-cancel" class="secondary" hidden>Cancelar edición</button>
+      </form>
+      <ul id="task-list" class="task-list"></ul>
+    </section>
+
+    <section class="panel stats-panel" id="stats-panel" hidden>
+      <h2>Estadísticas</h2>
+      <div id="stats"></div>
+    </section>
+  </main>
+  <footer class="app-footer">&copy; 2025 Gestor Colaborativo</footer>
+
+  <script type="module" src="./src/js/main.js"></script>
+</body>
+</html>
