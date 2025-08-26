@@ -57,8 +57,12 @@ Alternativas: extensiones de Live Server en VS Code.
 - Paginación o virtualización para muchas tareas.
 - Confirmaciones modales al eliminar.
 - Exportar / importar datos (JSON).
-- Integración real con API REST.
 - Tests unitarios (Jest / Vitest) para lógica de `TaskManagerApp`.
+
+## Mejoras
+- Integración real con API REST:
+	Usando https://mockapi.io/
+	Endpoint: https://67da0d3435c87309f52ac712.mockapi.io/api/v1/tareas y https://67da0d3435c87309f52ac712.mockapi.io/api/v1/usuarios
 
 ---
 © 2025
