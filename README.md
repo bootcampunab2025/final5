@@ -1,4 +1,4 @@
-# Gestor de Tareas Colaborativo (Evaluación Final)
+# Gestor de Tareas Colaborativo (Evaluación Final 5)
 
 ## Descripción
 Aplicación web de gestión de tareas colaborativa desarrollada en JavaScript moderno. Implementa paradigmas de orientación a objetos (modelos `User` y `Task`, clase `TaskManagerApp`), orientación a eventos (listeners de formularios y botones para CRUD de tareas y autenticación) y programación asíncrona (carga inicial simulada de tareas mediante `fetchInitialTasks` con `async/await`). Usa `localStorage` para simular persistencia sin backend.
