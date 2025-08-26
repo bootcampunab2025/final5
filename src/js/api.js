@@ -1,18 +1,24 @@
-function delay(ms) { return new Promise(res => setTimeout(res, ms)); }
+function delay(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
 
 export async function fetchInitialTasks(users = []) {
-  await delay(400 + Math.random()*400);
-  const pick = (i) => users[i % users.length]?.id;
-  const creator = (i) => users[i % users.length]?.id;
-  const sample = [
-    { title: 'Revisar documentación', description: 'Leer requerimientos y objetivos', completed: false, assigneeId: pick(0), createdBy: creator(0) },
-    { title: 'Configurar entorno', description: 'Estructura de carpetas y Live Server', completed: true, assigneeId: pick(1), createdBy: creator(1) },
-    { title: 'Diseñar modelo de datos', description: 'Definir clases User y Task', completed: false, assigneeId: pick(2), createdBy: creator(2) },
-    { title: 'Implementar persistencia', description: 'Wrapper localStorage', completed: false, assigneeId: pick(0), createdBy: creator(0) },
-    { title: 'Controlador UI', description: 'Eventos y render dinámico', completed: true, assigneeId: pick(1), createdBy: creator(1) },
-    { title: 'Sembrar datos demo', description: 'Usuarios y tareas iniciales', completed: true, assigneeId: pick(2), createdBy: creator(2) },
-    { title: 'Refactorizar código', description: '', completed: false, assigneeId: null, createdBy: creator(1) },
-    { title: 'Revisión final', description: 'Verificar funcionalidades principales', completed: false, assigneeId: pick(0), createdBy: creator(0) }
-  ];
-  return sample;
+  await delay(400 + Math.random() * 400);
+
+  try {
+    const res = await fetch('https://67da0d3435c87309f52ac712.mockapi.io/api/v1/tareas');
+    const apiTasks = await res.json();
+
+    // Mapear las tareas de la API al formato esperado por tu app
+    return apiTasks.map((t, i) => ({
+      title: t.title || t.name || `Tarea ${i + 1}`,
+      description: t.description || '',
+      completed: Boolean(t.completed),
+      assigneeId: users[i % users.length]?.id || null,
+      createdBy: users[i % users.length]?.id || null,
+    }));
+  } catch (err) {
+    console.error("Error al obtener tareas desde MockAPI:", err);
+    return [];
+  }
 }

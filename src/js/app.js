@@ -4,8 +4,8 @@ import { fetchInitialTasks } from './api.js';
 
 export class TaskManagerApp {
   constructor() {
-  this.users = storage.loadUsers();
-  this.tasks = storage.loadTasks().map(t => new Task(t));
+    this.users = storage.loadUsers();
+    this.tasks = storage.loadTasks().map(t => new Task(t));
     this.currentUser = storage.loadSession();
     this.initialized = false;
   }
@@ -13,13 +13,14 @@ export class TaskManagerApp {
   persist() {
     storage.saveUsers(this.users);
     storage.saveTasks(this.tasks);
-    if (this.currentUser) storage.saveSession(this.currentUser); else storage.clearSession();
+    if (this.currentUser) storage.saveSession(this.currentUser);
+    else storage.clearSession();
   }
 
   login(username) {
     let user = this.users.find(u => u.username.toLowerCase() === username.toLowerCase());
     if (!user) {
-  user = new User(username);
+      user = new User(username);
       this.users.push(user);
     }
     this.currentUser = user;
@@ -32,11 +33,18 @@ export class TaskManagerApp {
     this.persist();
   }
 
-  listUsers() { return this.users.slice(); }
+  listUsers() {
+    return this.users.slice();
+  }
 
   createTask({ title, description, assigneeId }) {
     if (!this.currentUser) throw new Error('Debe iniciar sesión');
-    const task = new Task({ title, description, assigneeId: assigneeId || null, createdBy: this.currentUser.id });
+    const task = new Task({
+      title,
+      description,
+      assigneeId: assigneeId || null,
+      createdBy: this.currentUser.id
+    });
     this.tasks.push(task);
     this.persist();
     return task;
@@ -69,7 +77,7 @@ export class TaskManagerApp {
     const total = this.tasks.length;
     const completed = this.tasks.filter(t => t.completed).length;
     const pending = total - completed;
-    const completionRate = total ? (completed / total) : 0;
+    const completionRate = total ? completed / total : 0;
     const byUser = this.users.map(u => ({
       user: u,
       total: this.tasks.filter(t => t.assigneeId === u.id).length,
@@ -80,18 +88,26 @@ export class TaskManagerApp {
 
   async initializeIfEmpty() {
     if (this.initialized) return;
+
     if (this.tasks.length === 0) {
       if (this.users.length === 0) {
-        this.users.push(
-          new User('Ana Gonzalez'),
-          new User('Luis Perez'),
-          new User('Carla Romero')
-        );
+        // 🚀 Traer usuarios desde MockAPI
+        try {
+          const res = await fetch('https://67da0d3435c87309f52ac712.mockapi.io/api/v1/usuarios');
+          const apiUsers = await res.json();
+
+          this.users.push(...apiUsers.map(u => new User(u.name || u.username || u.id)));
+        } catch (err) {
+          console.error("Error al obtener usuarios desde MockAPI:", err);
+        }
       }
+
       const seed = await fetchInitialTasks(this.users);
       seed.forEach(s => this.tasks.push(new Task({ ...s })));
       this.persist();
     }
+
     this.initialized = true;
   }
+
 }
