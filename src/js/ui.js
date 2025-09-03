@@ -10,7 +10,6 @@ export class UIController {
     this.authPanel = document.getElementById('auth-panel');
     this.taskPanel = document.getElementById('task-panel');
     this.statsPanel = document.getElementById('stats-panel');
-
     this.taskForm = document.getElementById('task-form');
     this.taskTitle = document.getElementById('task-title');
     this.taskDesc = document.getElementById('task-desc');
@@ -18,12 +17,10 @@ export class UIController {
     this.taskFormCancel = document.getElementById('task-form-cancel');
     this.taskList = document.getElementById('task-list');
     this.statsBox = document.getElementById('stats');
-
     this.editingTaskId = null;
   }
 
   bindEvents() {
-    // Autenticación
     this.loginForm.addEventListener('submit', e => {
       e.preventDefault();
       const name = this.usernameInput.value.trim();
@@ -37,7 +34,6 @@ export class UIController {
       this.renderStats();
     });
 
-    // Crear / actualizar tarea
     this.taskForm.addEventListener('submit', e => {
       e.preventDefault();
       const data = {
@@ -59,7 +55,6 @@ export class UIController {
       this.resetTaskForm();
     });
 
-    // Delegación de eventos para acciones de tarea
     this.taskList.addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-action]');
       if (!btn) return;
@@ -92,7 +87,7 @@ export class UIController {
     this.userInfo.innerHTML = `<span>Usuario: <strong>${this.app.currentUser.username}</strong> <small style="opacity:.7">(${this.app.currentUser.email})</small></span> <button id="logout-btn" class="secondary">Salir</button>`;
       document.getElementById('logout-btn').addEventListener('click', () => {
         this.app.logout();
-        window.location.reload(); // simplifica limpieza de UI
+        window.location.reload();
       });
     } else {
       this.userInfo.textContent = '';
@@ -150,12 +145,46 @@ export class UIController {
 
   renderStats() {
     const s = this.app.stats();
+    let progressAttr = "low";
+    if (s.completionRate >= 0.8) progressAttr = "high";
+    else if (s.completionRate >= 0.4) progressAttr = "medium";
     this.statsBox.innerHTML = `
       <div class="stat-box"><span>Total</span><strong>${s.total}</strong></div>
       <div class="stat-box"><span>Completadas</span><strong>${s.completed}</strong></div>
       <div class="stat-box"><span>Pendientes</span><strong>${s.pending}</strong></div>
-      <div class="stat-box"><span>Avance</span><strong>${(s.completionRate*100).toFixed(0)}%</strong></div>
-      <div class="stat-box"><span>Por usuario</span>${s.byUser.map(x => `<div>${x.user.username}: ${x.completed}/${x.total}</div>`).join('') || '<div class="empty">Sin usuarios</div>'}</div>
+      <div class="stat-box" data-progress="${progressAttr}"><span>Avance</span><strong>${(s.completionRate*100).toFixed(0)}%</strong></div>
+      <div class="stat-box"><span>Por usuario</span>
+        ${s.byUser.map(x => {
+          const rate = x.total ? x.completed / x.total : 0;
+          let barColor = '#ef4444';
+          if (rate >= 0.8) barColor = '#22c55e';
+          else if (rate >= 0.4) barColor = '#facc15';
+          return `<div class="user-progress" data-userid="${x.user.id}">
+            <strong>${x.user.username}</strong>
+            <div class="badges-row">
+              <span class="badge badge-green">✔️ ${x.completed}</span>
+              <span class="badge badge-yellow">⏳ ${x.total - x.completed}</span>
+              <span class="badge badge-total">Total: ${x.total}</span>
+              <button class="delete-user-btn" title="Eliminar usuario" style="margin-left:1em;background:linear-gradient(90deg,#ef4444,#b91c1c);color:#fff;border:none;border-radius:8px;padding:0.3em 0.8em;cursor:pointer;font-weight:bold;">Eliminar</button>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-bar-inner" style="width:${(rate*100).toFixed(0)}%;background:${barColor};"></div>
+            </div>
+          </div>`;
+        }).join('') || '<div class="empty">Sin usuarios</div>'}
+      </div>
     `;
+    this.statsBox.querySelectorAll('.delete-user-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const userDiv = btn.closest('.user-progress');
+        const userId = userDiv.getAttribute('data-userid');
+        if (confirm('¿Seguro que quieres eliminar este usuario y sus tareas?')) {
+          this.app.deleteUser(userId);
+          this.renderUsersInSelect();
+          this.renderTasks();
+          this.renderStats();
+        }
+      });
+    });
   }
 }

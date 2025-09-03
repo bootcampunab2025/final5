@@ -1,3 +1,4 @@
+
 export class User {
   constructor(username, email) {
     this.username = username.trim();
@@ -20,8 +21,8 @@ export class Task {
     this.id = id;
     this.title = title.trim();
     this.description = description.trim();
-  this.assigneeId = assigneeId;
-  this.createdBy = createdBy;
+    this.assigneeId = assigneeId;
+    this.createdBy = createdBy;
     this.completed = completed;
     this.createdAt = new Date(createdAt);
     this.completedAt = completedAt ? new Date(completedAt) : null;
