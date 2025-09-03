@@ -1,3 +1,4 @@
+
 import { User, Task } from './models.js';
 import { storage } from './storage.js';
 import { fetchInitialTasks } from './api.js';
@@ -15,6 +16,15 @@ export class TaskManagerApp {
     storage.saveTasks(this.tasks);
     if (this.currentUser) storage.saveSession(this.currentUser);
     else storage.clearSession();
+  }
+
+  deleteUser(userId) {
+    this.users = this.users.filter(u => u.id !== userId);
+    this.tasks = this.tasks.filter(t => t.assigneeId !== userId && t.createdBy !== userId);
+    if (this.currentUser && this.currentUser.id === userId) {
+      this.currentUser = null;
+    }
+    this.persist();
   }
 
   login(username) {
@@ -91,23 +101,18 @@ export class TaskManagerApp {
 
     if (this.tasks.length === 0) {
       if (this.users.length === 0) {
-        // 🚀 Traer usuarios desde MockAPI
         try {
           const res = await fetch('https://67da0d3435c87309f52ac712.mockapi.io/api/v1/usuarios');
           const apiUsers = await res.json();
-
           this.users.push(...apiUsers.map(u => new User(u.name || u.username || u.id)));
         } catch (err) {
           console.error("Error al obtener usuarios desde MockAPI:", err);
         }
       }
-
       const seed = await fetchInitialTasks(this.users);
       seed.forEach(s => this.tasks.push(new Task({ ...s })));
       this.persist();
     }
-
     this.initialized = true;
   }
-
 }

@@ -9,7 +9,6 @@ export async function fetchInitialTasks(users = []) {
     const res = await fetch('https://67da0d3435c87309f52ac712.mockapi.io/api/v1/tareas');
     const apiTasks = await res.json();
 
-    // Mapear las tareas de la API al formato esperado por tu app
     return apiTasks.map((t, i) => ({
       title: t.title || t.name || `Tarea ${i + 1}`,
       description: t.description || '',
